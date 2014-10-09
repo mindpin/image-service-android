@@ -49,3 +49,5 @@ app/env-debug.properties
 app/env-release.properties
 app/app.keystore
 app/res/values/http_site.xml
+# Log Files
+*.log
