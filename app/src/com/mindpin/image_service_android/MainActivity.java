@@ -38,7 +38,7 @@ public class MainActivity extends ListActivity {
     private List<? extends Map<String, ?>> getData() {
         List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
         addItem(data, "simple", SimpleActivity.class);
-//        addItem(data, "other", OtherActivity.class);
+        addItem(data, "upload", UploadActivity.class);
 
         return data;
     }
