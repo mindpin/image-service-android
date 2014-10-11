@@ -2,4 +2,7 @@
 <resources>
     <string name="fa_camera">&#xf030;</string>
     <string name="fa_image">&#xf03e;</string>
+    <string name="fa_clipboard">&#xf0ea;</string>
+    <string name="fa_times">&#xf00d;</string>
+    <string name="fa_refresh">&#xf021;</string>
 </resources>
