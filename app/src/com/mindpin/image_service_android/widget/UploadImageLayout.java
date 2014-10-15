@@ -1,15 +1,16 @@
 package com.mindpin.image_service_android.widget;
 
 import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -32,6 +33,7 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     private IImageData image_data = null;
     private Animation operatingAnim;
     private LinearInterpolator lin;
+    private Animation top_left_out;
 
     public UploadImageLayout(Context context, String image_path) {
         super(context);
@@ -77,6 +79,32 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     }
 
     private void init_anim() {
+        top_left_out = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out_bottom_right_to_top_left);
+        top_left_out.setAnimationListener(new Animation.AnimationListener() {
+            int height, width;
+            long duration;
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                height = getHeight();
+                width = getWidth();
+                duration = top_left_out.getDuration();
+                // todo 不断改变width 和 height 才能完全实现动画所展示的效果，比较麻烦，暂时不做
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                setAnimation(null);
+                setVisibility(GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fade_in_top_left_to_bottom_right));
         operatingAnim = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
         lin = new LinearInterpolator();
         operatingAnim.setInterpolator(lin);
@@ -95,8 +123,8 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
 
     public void show_image_info() {
         findViewById(R.id.rl_image).setVisibility(View.VISIBLE);
+        findViewById(R.id.fatv_loading).setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.rotate_and_fade_out));
         findViewById(R.id.fatv_loading).setVisibility(View.GONE);
-        findViewById(R.id.fatv_loading).setAnimation(null);
     }
 
     public void upload() {
@@ -139,7 +167,7 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabtn_close:
-                this.setVisibility(GONE);
+                startAnimation(top_left_out);
                 break;
             case R.id.fabtn_copy:
             case R.id.tv_url:

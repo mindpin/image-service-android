@@ -38,6 +38,7 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabtn_camera:
+                // todo get from camera
                 upload_image("1");
                 break;
             case R.id.fabtn_image:
@@ -55,6 +56,7 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
         uploadImageLayout.upload();
 
         reset_ll_photos_padding_top();
+        ll_photos.requestLayout();
     }
 
     private void reset_ll_photos_padding_top() {
