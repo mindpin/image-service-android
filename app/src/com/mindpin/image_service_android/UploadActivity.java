@@ -57,14 +57,13 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
         Uri imageUri;
         try {
             imageUri = Uri.fromFile(new File(get_cache_dir(), get_new_cache_filename()));
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+            startActivityForResult(intent, Constants.Request.TAKE_PHOTO);
         } catch (Exception ex) {
             Toast.makeText(this, "您的机器当前不能正常拍照", Toast.LENGTH_LONG);
             return;
         }
-//指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
-        startActivityForResult(intent, Constants.Request.TAKE_PHOTO);
     }
 
     private String get_cache_dir() {
