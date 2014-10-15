@@ -8,6 +8,6 @@ import com.mindpin.image_service_android.models.interfaces.IImageData;
  */
 public class DataProvider {
     public static IImageData upload(String image_path) {
-        return new ImageData();
+        return new ImageData(image_path);
     }
 }

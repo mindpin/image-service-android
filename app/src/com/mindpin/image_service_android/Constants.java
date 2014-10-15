@@ -5,6 +5,7 @@ package com.mindpin.image_service_android;
  */
 public class Constants {
     public static class Request {
-        public static int RESULT_LOAD_IMAGE = 1;
+        public static final int GET_IMAGE_FROM_ALBUM = 1;
+        public static final int TAKE_PHOTO = 2;
     }
 }

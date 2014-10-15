@@ -18,6 +18,16 @@ public class ImageData implements IImageData {
         major_color = 0x00000004;
     }
 
+
+    public ImageData(String path) {
+        filename = path;
+        url = "file://" + path;
+        filesize = 1;
+        width = 2;
+        height = 3;
+        major_color = 0x00000004;
+    }
+
     @Override
     public String get_filename() {
         return filename;

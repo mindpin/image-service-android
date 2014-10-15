@@ -17,7 +17,6 @@
                    android:id="@+id/iv_image"
                    android:background="@drawable/image"
                    android:layout_alignParentLeft="true"
-                   android:src="@drawable/test_image"
                 />
         <LinearLayout android:layout_width="44dp" android:layout_height="80dp"
                       android:orientation="vertical"

@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.mindpin.image_service_android.R;
 import com.mindpin.image_service_android.models.interfaces.IImageData;
 import com.mindpin.image_service_android.network.DataProvider;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import roboguice.util.RoboAsyncTask;
 
 import java.util.Random;
@@ -157,7 +158,8 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     private void bind_image_info() {
         try {
             tv_url.setText(image_data.get_url());
-            iv_image.setImageBitmap(BitmapFactory.decodeFile(image_path));
+//            iv_image.setImageBitmap(BitmapFactory.decodeFile(image_data.get_url()));
+            ImageLoader.getInstance().displayImage(image_data.get_url(), iv_image);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
