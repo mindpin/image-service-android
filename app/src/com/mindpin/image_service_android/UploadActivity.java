@@ -76,7 +76,8 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
     }
 
     private String get_new_cache_filename() {
-        return filename = String.valueOf(System.currentTimeMillis()) + ".jpg";
+        filename = String.valueOf(System.currentTimeMillis()) + ".jpg";
+        return filename;
     }
 
     private void upload_image(String image_path) {
