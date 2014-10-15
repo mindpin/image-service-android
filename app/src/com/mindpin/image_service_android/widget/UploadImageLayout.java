@@ -82,7 +82,9 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     private void init_anim() {
         top_left_out = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out_bottom_right_to_top_left);
         top_left_out.setAnimationListener(new Animation.AnimationListener() {
-            int height, width;
+            int height
+                    ,
+                    width;
             long duration;
 
             @Override
@@ -138,13 +140,17 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
             @Override
             public Void call() throws Exception {
                 image_data = DataProvider.upload(image_path);
-                Thread.sleep(500 + new Random().nextInt(3000));
                 return null;
             }
 
             @Override
             protected void onSuccess(Void aVoid) throws Exception {
-                show();
+                if (image_data == null) {
+                    startAnimation(top_left_out);
+                    Toast.makeText(getContext(), "上传图片失败，请检查网络", Toast.LENGTH_LONG).show();
+                }
+                else
+                    show();
             }
         }.execute();
 

@@ -42,7 +42,6 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabtn_camera:
-                // todo get from camera
                 take_photo();
                 break;
             case R.id.fabtn_image:
@@ -62,7 +61,6 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
             Toast.makeText(this, "您的机器当前不能正常拍照", Toast.LENGTH_LONG);
             return;
         }
-        System.out.println("imageUri:" + imageUri);
 //指定照片保存路径（SD卡），image.jpg为一个临时文件，每次拍照后这个图片都会被替换
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
@@ -82,7 +80,6 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
     }
 
     private void upload_image(String image_path) {
-        System.out.println("image_path:" + image_path);
         UploadImageLayout uploadImageLayout = new UploadImageLayout(this, image_path);
         LinearLayout.LayoutParams params =
                 new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

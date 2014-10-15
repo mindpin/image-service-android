@@ -11,5 +11,5 @@ public interface IImageData extends Serializable {
     public int get_filesize();
     public int get_width();
     public int get_height();
-    public int get_major_color();
+    public Object get_major_color();
 }

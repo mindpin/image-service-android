@@ -7,25 +7,10 @@ import com.mindpin.image_service_android.models.interfaces.IImageData;
  */
 public class ImageData implements IImageData {
     String filename, url;
-    int filesize, width, height, major_color;
+    int filesize, width, height;
+    Object major_color;
 
     public ImageData() {
-        filename = "filenamefilenamefilename";
-        url = "urlurlurl";
-        filesize = 1;
-        width = 2;
-        height = 3;
-        major_color = 0x00000004;
-    }
-
-
-    public ImageData(String path) {
-        filename = path;
-        url = "file://" + path;
-        filesize = 1;
-        width = 2;
-        height = 3;
-        major_color = 0x00000004;
     }
 
     @Override
@@ -54,7 +39,7 @@ public class ImageData implements IImageData {
     }
 
     @Override
-    public int get_major_color() {
+    public Object get_major_color() {
         return major_color;
     }
 }
