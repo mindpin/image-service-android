@@ -2,26 +2,23 @@ package com.mindpin.image_service_android.widget;
 
 import android.content.ClipData;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.ViewTreeObserver;
+import android.view.animation.*;
+import android.widget.*;
 import com.mindpin.image_service_android.R;
 import com.mindpin.image_service_android.models.interfaces.IImageData;
 import com.mindpin.image_service_android.network.DataProvider;
+import com.mindpin.image_service_android.utils.PointEvaluator;
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.ValueAnimator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import roboguice.util.RoboAsyncTask;
-
-import java.util.Random;
 
 /**
  * Created by dd on 14-10-13.
@@ -29,12 +26,13 @@ import java.util.Random;
 public class UploadImageLayout extends RelativeLayout implements View.OnClickListener {
     ImageView iv_image;
     FontAwesomeButton fabtn_copy, fabtn_close;
+    FontAwesomeTextView fatv_loading;
     TextView tv_url;
     private String image_path = null;
     private IImageData image_data = null;
-    private Animation operatingAnim;
-    private LinearInterpolator lin;
-    private Animation top_left_out;
+    boolean is_first_to_bottom_right = true;//默认调用两次，这里只让它执行一次回调
+    private ValueAnimator animator_to_bottom_right;
+    private ValueAnimator animator_to_top_left;
 
     public UploadImageLayout(Context context, String image_path) {
         super(context);
@@ -76,41 +74,44 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
         iv_image = (ImageView) findViewById(R.id.iv_image);
         fabtn_copy = (FontAwesomeButton) findViewById(R.id.fabtn_copy);
         fabtn_close = (FontAwesomeButton) findViewById(R.id.fabtn_close);
+        fatv_loading = (FontAwesomeTextView) findViewById(R.id.fatv_loading);
         tv_url = (TextView) findViewById(R.id.tv_url);
     }
 
     private void init_anim() {
-        top_left_out = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out_bottom_right_to_top_left);
-        top_left_out.setAnimationListener(new Animation.AnimationListener() {
-            int height
-                    ,
-                    width;
-            long duration;
+        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             @Override
-            public void onAnimationStart(Animation animation) {
-                height = getHeight();
-                width = getWidth();
-                duration = top_left_out.getDuration();
-                // todo 不断改变width 和 height 才能完全实现动画所展示的效果，比较麻烦，暂时不做
-            }
+            public void onGlobalLayout() {
+                if (is_first_to_bottom_right) {
+                    is_first_to_bottom_right = false;
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                setAnimation(null);
-                setVisibility(GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
+                    to_bottom_right(getWidth(), getHeight(), (LinearLayout.LayoutParams) getLayoutParams());
+                }
             }
         });
 
-        setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fade_in_top_left_to_bottom_right));
-        operatingAnim = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
-        lin = new LinearInterpolator();
-        operatingAnim.setInterpolator(lin);
+    }
+
+    private void to_bottom_right(int width, int height, final LinearLayout.LayoutParams layoutParams) {
+        Point p0 = new Point(0, 0);
+        Point p1 = new Point(width, height);
+        animator_to_bottom_right =
+                ValueAnimator.ofObject(new PointEvaluator(), p0, p1)
+                        .setDuration(1000);
+        animator_to_bottom_right.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                Point point = (Point) valueAnimator.getAnimatedValue();
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(point.x, point.y);
+                params.setMargins(
+                        layoutParams.leftMargin, layoutParams.topMargin,
+                        layoutParams.rightMargin, layoutParams.bottomMargin
+                );
+                setLayoutParams(params);
+            }
+        });
+        animator_to_bottom_right.start();
     }
 
 
@@ -120,14 +121,15 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
 
     private void moving_up(View view) {
         if (view != null) {
-            view.startAnimation(operatingAnim);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f).setDuration(500);
+            objectAnimator.setRepeatCount(ObjectAnimator.INFINITE);
+            objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            objectAnimator.start();
         }
     }
 
     public void show_image_info() {
         findViewById(R.id.rl_image).setVisibility(View.VISIBLE);
-        findViewById(R.id.fatv_loading).setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.rotate_and_fade_out));
-        findViewById(R.id.fatv_loading).setVisibility(View.GONE);
     }
 
     public void upload() {
@@ -146,14 +148,81 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
             @Override
             protected void onSuccess(Void aVoid) throws Exception {
                 if (image_data == null) {
-                    startAnimation(top_left_out);
+                    hide_loading();
+                    top_left_out();
                     Toast.makeText(getContext(), "上传图片失败，请检查网络", Toast.LENGTH_LONG).show();
-                }
-                else
+                } else {
                     show();
+                    hide_loading();
+                }
             }
         }.execute();
 
+    }
+
+    private void hide_loading() {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(fatv_loading, "alpha", 1f, 0f).setDuration(200);
+        objectAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                removeView(fatv_loading);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        objectAnimator.start();
+    }
+
+    private void top_left_out() {
+        animator_to_bottom_right.cancel();
+        Point p0 = new Point(getWidth(), getHeight());
+        Point p1 = new Point(0, 0);
+        animator_to_top_left =
+                ValueAnimator.ofObject(new PointEvaluator(), p0, p1)
+                        .setDuration(300);
+        animator_to_top_left.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                Point point = (Point) valueAnimator.getAnimatedValue();
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(point.x, point.y);
+                setLayoutParams(params);
+            }
+        });
+        animator_to_top_left.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                ((ViewGroup)getParent()).removeView(UploadImageLayout.this);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        animator_to_top_left.start();
     }
 
     private void show() {
@@ -164,7 +233,6 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     private void bind_image_info() {
         try {
             tv_url.setText(image_data.get_url());
-//            iv_image.setImageBitmap(BitmapFactory.decodeFile(image_data.get_url()));
             ImageLoader.getInstance().displayImage(image_data.get_url(), iv_image);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -175,13 +243,17 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabtn_close:
-                startAnimation(top_left_out);
+                close();
                 break;
             case R.id.fabtn_copy:
             case R.id.tv_url:
                 copy();
                 break;
         }
+    }
+
+    private void close() {
+        top_left_out();
     }
 
     private void copy() {
