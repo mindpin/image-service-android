@@ -24,6 +24,8 @@ import roboguice.util.RoboAsyncTask;
  * Created by dd on 14-10-13.
  */
 public class UploadImageLayout extends RelativeLayout implements View.OnClickListener {
+    private static final String FORMAT_URL_PLUS = "@%dw_%dh_1e_1c.png";
+    private static String url_plus = "";
     ImageView iv_image;
     FontAwesomeButton fabtn_copy, fabtn_close;
     FontAwesomeTextView fatv_loading;
@@ -233,7 +235,8 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
     private void bind_image_info() {
         try {
             tv_url.setText(image_data.get_url());
-            ImageLoader.getInstance().displayImage(image_data.get_url(), iv_image);
+            String url_fix = image_data.get_url() + url_plus;
+            ImageLoader.getInstance().displayImage(url_fix, iv_image);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -269,5 +272,9 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
             clipboard.setText(image_data.get_url());
         }
         Toast.makeText(getContext().getApplicationContext(), "已成功复制url", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void set_image_size(int dp80) {
+        url_plus = String.format(FORMAT_URL_PLUS, dp80, dp80);
     }
 }

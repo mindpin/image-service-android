@@ -36,6 +36,8 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
         findViewById(R.id.fabtn_camera).setOnClickListener(this);
         findViewById(R.id.fabtn_image).setOnClickListener(this);
         ll_photos = (LinearLayout) findViewById(R.id.ll_photos);
+        int dp80 = BaseUtils.dp_to_px(80);
+        UploadImageLayout.set_image_size(dp80);
     }
 
     @Override
@@ -92,8 +94,9 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
     }
 
     private void reset_ll_photos_padding_top() {
+        int dp5 = BaseUtils.dp_to_px(5);
         if (ll_photos.getChildCount() > 1) {
-            ll_photos.setPadding(0, 5, 0, 0);
+            ll_photos.setPadding(0, dp5, 0, 0);
         } else
             ll_photos.setPadding(0, 0, 0, 0);
     }

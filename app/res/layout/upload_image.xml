@@ -13,7 +13,7 @@
             >
         <ImageView android:layout_width="100dp" android:layout_height="100dp"
                    android:padding="10dp"
-                   android:scaleType="fitCenter"
+                   android:scaleType="centerCrop"
                    android:id="@+id/iv_image"
                    android:background="@drawable/image"
                    android:layout_alignParentLeft="true"
@@ -46,16 +46,27 @@
                     />
         </LinearLayout>
 
+        <!--android:lineSpacingMultiplier="0"-->
+        <!--android:lineSpacingExtra="20dp"-->
+        <!--是为了20dp的行高，但是上下padding却只能为2dp,很奇怪-->
         <TextView android:layout_width="wrap_content" android:layout_height="80dp"
                   android:id="@+id/tv_url"
                   android:layout_margin="10dp"
                   android:maxLines="4"
                   android:textSize="12dp"
-                  android:lineSpacingExtra="8dp"
+                  android:lineSpacingMultiplier="0"
+                  android:lineSpacingExtra="20dp"
                   android:layout_toLeftOf="@id/ll_buttons"
                   android:layout_toRightOf="@id/iv_image"
                   android:background="#F7F7F7"
                   android:layout_centerVertical="true"
+                  android:paddingTop="2dp"
+                  android:paddingBottom="2dp"
+                  android:paddingLeft="4dp"
+                  android:paddingRight="4dp"
+                  android:scrollHorizontally="false"
+                  android:ellipsize="none"
+                  android:inputType="textMultiLine"
                 />
     </RelativeLayout>
 
