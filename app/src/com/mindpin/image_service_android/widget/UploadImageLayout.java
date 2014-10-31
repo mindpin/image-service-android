@@ -8,30 +8,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.*;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.*;
+import com.mindpin.android.image4ye.Image4ye;
 import com.mindpin.image_service_android.R;
-import com.mindpin.image_service_android.models.interfaces.IImageData;
-import com.mindpin.image_service_android.network.DataProvider;
 import com.mindpin.image_service_android.utils.PointEvaluator;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import roboguice.util.RoboAsyncTask;
+
+import java.io.File;
 
 /**
  * Created by dd on 14-10-13.
  */
 public class UploadImageLayout extends RelativeLayout implements View.OnClickListener {
-    private static final String FORMAT_URL_PLUS = "@%dw_%dh_1e_1c.png";
-    private static String url_plus = "";
     ImageView iv_image;
     FontAwesomeButton fabtn_copy, fabtn_close;
     FontAwesomeTextView fatv_loading;
     TextView tv_url;
     private String image_path = null;
-    private IImageData image_data = null;
+    private Image4ye image_data = null;
     boolean is_first_to_bottom_right = true;//默认调用两次，这里只让它执行一次回调
     private ValueAnimator animator_to_bottom_right;
     private ValueAnimator animator_to_top_left;
@@ -139,26 +137,25 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
             System.out.println("not image_path cancel upload");
             return;
         }
-        new RoboAsyncTask<Void>(getContext()) {
-
+        Image4ye.upload(new File(image_path), new Image4ye.Image4yeUploadListener() {
             @Override
-            public Void call() throws Exception {
-                image_data = DataProvider.upload(image_path);
-                return null;
+            public void start() {
+
             }
 
             @Override
-            protected void onSuccess(Void aVoid) throws Exception {
-                if (image_data == null) {
+            public void end(Image4ye u) {
+                if (u == null) {
                     hide_loading();
                     top_left_out();
                     Toast.makeText(getContext(), "上传图片失败，请检查网络", Toast.LENGTH_LONG).show();
                 } else {
+                    image_data = u;
                     show();
                     hide_loading();
                 }
             }
-        }.execute();
+        });
 
     }
 
@@ -234,8 +231,8 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
 
     private void bind_image_info() {
         try {
-            tv_url.setText(image_data.get_url());
-            String url_fix = image_data.get_url() + url_plus;
+            tv_url.setText(image_data.url);
+            String url_fix = image_data.url(image_slide_length, image_slide_length, true);
             ImageLoader.getInstance().displayImage(url_fix, iv_image);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -264,17 +261,19 @@ public class UploadImageLayout extends RelativeLayout implements View.OnClickLis
         if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
             android.content.ClipboardManager clipboard =
                     (android.content.ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("url", image_data.get_url());
+            ClipData clip = ClipData.newPlainText("url", image_data.url);
             clipboard.setPrimaryClip(clip);
         } else {
             android.text.ClipboardManager clipboard =
                     (android.text.ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboard.setText(image_data.get_url());
+            clipboard.setText(image_data.url);
         }
         Toast.makeText(getContext().getApplicationContext(), "已成功复制url", Toast.LENGTH_SHORT).show();
     }
 
+
+    private static int image_slide_length = 0;
     public static void set_image_size(int dp80) {
-        url_plus = String.format(FORMAT_URL_PLUS, dp80, dp80);
+        image_slide_length  = dp80;
     }
 }

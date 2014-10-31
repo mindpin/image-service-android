@@ -52,8 +52,6 @@ public class UploadActivity extends RoboActivity implements View.OnClickListener
         }
     }
 
-    Uri imageUri = null;
-
     private void take_photo() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Uri imageUri;

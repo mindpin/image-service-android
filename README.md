@@ -14,12 +14,31 @@ image service android apk
 
 使用说明
 ---------------------
-请运行**app** module
+**安装**
+运行本app需要安装以下image-service maven库
+
+先安装java版本
+```
+git clone https://github.com/mindpin/image-service-java-lib
+cd image-service-java-lib
+mvn clean install
+```
+
+然后安装android版本(android版本依赖于Java版本)
+```
+git clone https://github.com/mindpin/image-service-android-lib
+cd image-service-android-lib
+mvn clean install
+```
 
 
 依赖库
 ---------------------
 * [destinyd/android-archetypes][android-archetypes]
+* [mindpin/image-service-java-lib][image-service-java-lib]
+* [mindpin/image-service-android-lib][image-service-android-lib]
 
 
 [android-archetypes]: https://github.com/destinyd/android-archetypes
+[image-service-java-lib]: https://github.com/mindpin/image-service-java-lib
+[image-service-android-lib]: https://github.com/mindpin/image-service-android-lib

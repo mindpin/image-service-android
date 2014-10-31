@@ -65,6 +65,12 @@
             <artifactId>library</artifactId>
             <version>2.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.mindpin.android.image4ye</groupId>
+            <artifactId>image4ye</artifactId>
+            <version>0.1.0</version>
+            <type>apklib</type>
+        </dependency>
     </dependencies>
 
     <build>
